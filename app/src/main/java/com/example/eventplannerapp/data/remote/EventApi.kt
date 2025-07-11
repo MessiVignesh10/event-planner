@@ -7,4 +7,6 @@ interface EventApi {
 
     suspend fun addEvent(event: Event) : Event
 
+    suspend fun deleteEvent(eventId : Int) : Boolean
+
 }
