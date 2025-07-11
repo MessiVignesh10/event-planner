@@ -52,6 +52,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Icon
 import com.example.eventplannerapp.R
+import java.util.Locale
 
 
 @Composable
@@ -66,7 +67,6 @@ fun AddEventScreen(modifier: Modifier = Modifier, viewModel: AddEventsViewModel 
     val day = calendar.get(Calendar.DAY_OF_MONTH)
     val hour = calendar.get(Calendar.HOUR_OF_DAY)
     val minute = calendar.get(Calendar.MINUTE)
-    val second = calendar.get(Calendar.SECOND)
 
 
     var name by remember { mutableStateOf("") }
@@ -77,9 +77,11 @@ fun AddEventScreen(modifier: Modifier = Modifier, viewModel: AddEventsViewModel 
     val datePickerDialog = DatePickerDialog(context,
         { _, selectedYear, selectedMonth, selectedDayOfMonth ->
             val formattedDate = "$selectedDayOfMonth ${calendar.getDisplayName(Calendar.MONTH ,
-                Calendar.SHORT , java.util.Locale.getDefault())} $selectedYear"
+                Calendar.SHORT , Locale.getDefault())} $selectedYear"
             date = formattedDate
-        },year,month,day)
+        },year,month,day).apply {
+            datePicker.minDate = calendar.timeInMillis
+    }
 
     val timePickerDialog = TimePickerDialog(context,{_,selectedHour,selectedMinute ->
         time = "$selectedHour $selectedMinute "
@@ -93,10 +95,11 @@ fun AddEventScreen(modifier: Modifier = Modifier, viewModel: AddEventsViewModel 
         when(state){
             is AddEventsViewModelState.Success -> {
                 onEventAdded()
+                viewModel.reset()
             }
             is AddEventsViewModelState.Error -> {
                 Toast.makeText(context,"Something went wrong", Toast.LENGTH_LONG).show()
-
+                viewModel.reset()
             }
             else -> Unit
         }

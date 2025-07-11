@@ -20,9 +20,9 @@ class EventListViewModel(private val repository: EventRepository) : ViewModel() 
     val state: StateFlow<EventListViewModelState> = _state
 
 
-    init {
-        loadEvents()
-    }
+init {
+    loadEvents()
+}
 
     fun loadEvents() {
         viewModelScope.launch {
@@ -37,4 +37,15 @@ class EventListViewModel(private val repository: EventRepository) : ViewModel() 
             }
         }
     }
+    fun deleteEvents(eventId: Int){
+        viewModelScope.launch {
+            println("Deleting event with $eventId")
+            val success = repository.deleteEvent(eventId = eventId)
+            println("Deletion Success $success")
+            if (success){
+                loadEvents()
+            }
+        }
+    }
+
 }

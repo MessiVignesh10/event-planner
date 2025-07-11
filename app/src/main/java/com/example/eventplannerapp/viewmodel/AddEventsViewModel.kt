@@ -2,7 +2,6 @@ package com.example.eventplannerapp.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.eventplannerapp.data.model.Event
 import com.example.eventplannerapp.data.repository.EventRepository
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -32,7 +31,7 @@ class AddEventsViewModel (private val repository: EventRepository) : ViewModel()
                     EventName = eventName,
                     EventDescription = eventDescription,
                     EventDate = eventDate,
-                    EventTime = eventTime
+                    EventTime = eventTime,
                 )
                 repository.addEvents(event = events)
                 _state.value = AddEventsViewModelState.Success
@@ -40,5 +39,9 @@ class AddEventsViewModel (private val repository: EventRepository) : ViewModel()
                 _state.value = AddEventsViewModelState.Error(e.localizedMessage ?: "Problems with adding the event !!")
             }
         }
+    }
+    fun reset(){
+        _state.value = AddEventsViewModelState.Idle
+
     }
 }
