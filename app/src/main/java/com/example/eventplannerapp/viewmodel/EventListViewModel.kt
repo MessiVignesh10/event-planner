@@ -37,7 +37,7 @@ init {
             }
         }
     }
-    fun deleteEvents(eventId: Int){
+    fun deleteEvents(eventId: Long){
         viewModelScope.launch {
             println("Deleting event with $eventId")
             val success = repository.deleteEvent(eventId = eventId)

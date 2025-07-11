@@ -1,7 +1,7 @@
 package com.example.eventplannerapp.data.model
 
 data class Event(
-    val id: Int,
+    val id: Long,
     val EventName: String,
     val EventDescription: String,
     val EventDate: String,

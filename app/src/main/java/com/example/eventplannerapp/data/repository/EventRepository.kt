@@ -13,7 +13,7 @@ class EventRepository (private val api : FakeEventApi) {
         api.addEvent(event)
         return event
     }
-    suspend fun deleteEvent(eventId : Int) : Boolean{
+    suspend fun deleteEvent(eventId : Long) : Boolean{
        return api.deleteEvent(eventId = eventId)
     }
 }

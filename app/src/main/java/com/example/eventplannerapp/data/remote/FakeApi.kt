@@ -12,11 +12,10 @@ class FakeEventApi : EventApi {
     }
 
     override suspend fun addEvent(event: Event): Event {
-        val newEvent = event.copy(id = idCounter++)
-        events.add(newEvent)
-        return newEvent
+        events.add(event)
+        return event
     }
-    suspend fun deleteEvent(eventId : Int): Boolean {
+    override suspend fun deleteEvent(eventId : Long): Boolean {
         return events.removeIf { it.id == eventId }
 
     }

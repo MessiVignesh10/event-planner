@@ -27,7 +27,7 @@ class AddEventsViewModel (private val repository: EventRepository) : ViewModel()
             _state.value = AddEventsViewModelState.Loading
             try {
                 val events = Event(
-                    id = 0,
+                    id = System.currentTimeMillis(),
                     EventName = eventName,
                     EventDescription = eventDescription,
                     EventDate = eventDate,
