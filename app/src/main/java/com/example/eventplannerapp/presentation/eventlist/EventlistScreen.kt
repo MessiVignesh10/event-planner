@@ -33,10 +33,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import com.example.eventplannerapp.presentation.navigation.Screen
 import com.example.eventplannerapp.viewmodel.EventListViewModelState
 
 @Composable
-fun EventListScreen(modifier: Modifier = Modifier, viewModel: EventListViewModel = viewModel() , onNavigateToAdd :() -> Unit) {
+fun EventListScreen(
+    modifier: Modifier = Modifier,
+    viewModel: EventListViewModel = viewModel(),
+    onNavigateToAdd: () -> Unit,
+    navController: NavController
+) {
     val state by viewModel.state.collectAsState()
 
     Column(
@@ -47,7 +54,7 @@ fun EventListScreen(modifier: Modifier = Modifier, viewModel: EventListViewModel
         verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {
         Text("Your Events", style = MaterialTheme.typography.displaySmall)
-        Button(onClick = {onNavigateToAdd()}) {
+        Button(onClick = { onNavigateToAdd() }) {
             Text("Add new Event")
         }
 
@@ -59,48 +66,72 @@ fun EventListScreen(modifier: Modifier = Modifier, viewModel: EventListViewModel
 
             is EventListViewModelState.Success -> {
                 val events = (state as EventListViewModelState.Success).events
-                LazyColumn(modifier.fillMaxSize().padding(horizontal = 16.dp)) {
-                    items(events) {event ->
-                        Card(modifier.fillMaxWidth().padding(10.dp).clickable(onClick = {}), shape = RoundedCornerShape(10.dp)) {
+                LazyColumn(modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 16.dp)) {
+                    items(events) { event ->
+                        Card(
+                            modifier
+                                .fillMaxWidth()
+                                .padding(10.dp)
+                                .clickable(onClick = {
+                                    navController.currentBackStackEntry?.savedStateHandle?.set(
+                                        key = "event",
+                                        event
+                                    )
+                                    navController.navigate(Screen.EventDetail.route)
+                                }),
+                            shape = RoundedCornerShape(10.dp)
+                        ) {
                             Column(modifier.padding(15.dp)) {
                                 Column {
-                                Text(event.EventName, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.ExtraBold)
-                                Spacer(modifier.height(20.dp))
-                                Text(
-                                    "Description : ${event.EventDescription}",
-                                    style = MaterialTheme.typography.bodyMedium
-                                )
-                                Spacer(modifier.height(10.dp))
-                                Row(modifier.fillMaxHeight()) {
                                     Text(
-                                        "Date : ${event.EventDate}",
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = Color.Blue
+                                        event.EventName,
+                                        style = MaterialTheme.typography.bodyLarge,
+                                        fontWeight = FontWeight.ExtraBold
                                     )
-                                    Spacer(modifier.width(10.dp))
+                                    Spacer(modifier.height(20.dp))
                                     Text(
-                                        "Time : ${event.EventTime}",
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = Color.Blue
+                                        "Description : ${event.EventDescription}",
+                                        style = MaterialTheme.typography.bodyMedium
                                     )
-                                    Spacer(modifier.weight(1f))
-                                   IconButton(onClick = {
-                                       println("Clicked event id to delete is ${event.id}")
-                                       viewModel.deleteEvents(eventId = event.id)}) {
-                                       Icon(imageVector = Icons.Default.Delete , contentDescription = "delete Event" , tint = Color.Red)
-                                   }
+                                    Spacer(modifier.height(10.dp))
+                                    Row(modifier.fillMaxHeight()) {
+                                        Text(
+                                            "Date : ${event.EventDate}",
+                                            style = MaterialTheme.typography.bodySmall,
+                                            color = Color.Blue
+                                        )
+                                        Spacer(modifier.width(10.dp))
+                                        Text(
+                                            "Time : ${event.EventTime}",
+                                            style = MaterialTheme.typography.bodySmall,
+                                            color = Color.Blue
+                                        )
+                                        Spacer(modifier.weight(1f))
+                                        IconButton(onClick = {
+                                            println("Clicked event id to delete is ${event.id}")
+                                            viewModel.deleteEvents(eventId = event.id)
+                                        }) {
+                                            Icon(
+                                                imageVector = Icons.Default.Delete,
+                                                contentDescription = "delete Event",
+                                                tint = Color.Red
+                                            )
+                                        }
+                                    }
+
+
                                 }
-
-
-                            }
                             }
                         }
                     }
                 }
             }
+
             is EventListViewModelState.Error -> {
                 val errorMessage = (state as EventListViewModelState.Error).message
-                Text(errorMessage , color = Color.Red , style = MaterialTheme.typography.bodySmall)
+                Text(errorMessage, color = Color.Red, style = MaterialTheme.typography.bodySmall)
             }
         }
     }

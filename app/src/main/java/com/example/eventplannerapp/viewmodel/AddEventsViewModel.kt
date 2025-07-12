@@ -32,6 +32,7 @@ class AddEventsViewModel (private val repository: EventRepository) : ViewModel()
                     EventDescription = eventDescription,
                     EventDate = eventDate,
                     EventTime = eventTime,
+                    EventCreationTime = System.currentTimeMillis()
                 )
                 repository.addEvents(event = events)
                 _state.value = AddEventsViewModelState.Success
