@@ -1,22 +1,29 @@
 package com.example.eventplannerapp.data.remote
 
 import com.example.eventplannerapp.data.model.Event
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 
 class FakeEventApi : EventApi {
 
-    private val events = mutableListOf<Event>()
-    private var idCounter = 1
+    private val _events = MutableStateFlow<List<Event>>(emptyList())
+    val events : StateFlow<List<Event>> = _events
 
     override suspend fun getEvents(): List<Event> {
-        return events
+        return _events.value
     }
 
     override suspend fun addEvent(event: Event): Event {
-        events.add(event)
+        val updated = _events.value.toMutableList()
+        updated.add(event)
+        _events.value = updated
         return event
     }
     override suspend fun deleteEvent(eventId : Long): Boolean {
-        return events.removeIf { it.id == eventId }
+        val updated = _events.value.toMutableList()
+        val removed = updated.removeIf { it.id == eventId }
+        _events.value = updated
+        return removed
 
     }
 }

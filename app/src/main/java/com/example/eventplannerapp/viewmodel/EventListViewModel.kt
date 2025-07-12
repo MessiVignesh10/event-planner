@@ -6,6 +6,8 @@ import com.example.eventplannerapp.data.model.Event
 import com.example.eventplannerapp.data.repository.EventRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 
 sealed class EventListViewModelState {
@@ -21,29 +23,32 @@ class EventListViewModel(private val repository: EventRepository) : ViewModel() 
 
 
 init {
-    loadEvents()
+    observeEvents()
 }
 
-    fun loadEvents() {
+    private fun observeEvents(){
         viewModelScope.launch {
-            _state.value = EventListViewModelState.Loading
-            try {
-                val events =
-                    repository.getEvents()
-                _state.value = EventListViewModelState.Success(events = events)
-            } catch (e: Exception) {
-                _state.value =
-                    EventListViewModelState.Error(e.localizedMessage ?: "Events are not loading")
-            }
+            repository.eventsFlow
+                .onStart {
+                    _state.value = EventListViewModelState.Loading
+                }
+                .catch { e ->
+                    _state.value = EventListViewModelState.Error(e.localizedMessage ?: "Unknown Error")
+                }
+                .collect { eventList ->
+                    _state.value = EventListViewModelState.Success(events = eventList)
+                }
         }
     }
+
+
     fun deleteEvents(eventId: Long){
         viewModelScope.launch {
             println("Deleting event with $eventId")
             val success = repository.deleteEvent(eventId = eventId)
             println("Deletion Success $success")
             if (success){
-                loadEvents()
+
             }
         }
     }
